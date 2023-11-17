@@ -4,6 +4,8 @@ import sys
 import pygame_menu
 import palabras
 
+#Cambiar letra de menu
+
 #Se inicializa la libreria pygame
 pygame.init()
 
@@ -19,8 +21,10 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 
 #Se define las fuentes del titulo y el menu
-font_title = pygame.font.SysFont('comicsans', 60)
-font_menu = pygame.font.SysFont('comicsans', 36)
+font_title = pygame.font.Font(None, 60)
+font_menu = pygame.font.Font(None, 36)
+
+
 
 #Se recibe las palabras desde palabras.py
 palabras = palabras.palabras_juego
@@ -112,15 +116,20 @@ def juego():
 
         pygame.display.flip()
         
-        
+def puntajes(nombre_jugador, puntaje):
+    leer_archivo = open("highscore.txt", "r")
+    texto = font_menu.render(leer_archivo.read(), True, BLACK)
+    leer_archivo.close()
 
 #Armado del menu principal
 menu = pygame_menu.Menu('AHORCADO', WIDTH, HEIGHT,
                        theme=pygame_menu.themes.THEME_DEFAULT)
 
 nombre_jugador = ''
+
 menu.add.text_input('Nombre jugador: ', default='Coloca tu nombre', onchange=recibir_nombre_jugador)
 menu.add.button('Jugar', juego)
+menu.add.button('Puntajes', puntajes)
 menu.add.button('Salir', pygame_menu.events.EXIT)
 
 menu.mainloop(screen)
