@@ -74,6 +74,7 @@ def mostrar_cartel_animado(mensaje, color, duracion):
 def recibir_nombre_jugador(value, **kwargs):
     global nombre_jugador
     nombre_jugador = value
+    return nombre_jugador
 
 #Loop principal del juego
 def juego():
@@ -81,7 +82,8 @@ def juego():
     letras_correctas = set()
     intentos = 0
 
-    mostrar_cartel_animado(f"¡Comencemos, {nombre_jugador}!", BLACK, 2000)
+    mostrar_cartel_animado(f"¡Comencemos, {nombre_jugador}! \n " +
+                           "Para jugar usar el teclado, tenés 6 intentos", BLACK, 2000)
 
     while True:
         for event in pygame.event.get():
@@ -99,37 +101,65 @@ def juego():
         screen.fill(WHITE)
 
         mostrar_figura_humana(intentos)
-
         mostrar_palabra(palabra, letras_correctas)
-        
         
 
         texto_intentos = font_menu.render("Intentos restantes: {}".format(6 - intentos), True, BLACK)
+        calculos_puntos = 6 - intentos
         screen.blit(texto_intentos, (WIDTH // 2 - texto_intentos.get_width() // 2, 20))
 
         if all(letra.isalpha() and letra.lower() in letras_correctas for letra in palabra):
+            puntaje(calculos_puntos)
+            insertar_puntajes(nombre_jugador,puntuacion)
             mostrar_cartel_animado(f"¡Felicidades!, {nombre_jugador} ¡Has ganado!", BLACK, 2000)
             break
         elif intentos >= 6:
             mostrar_cartel_animado(f"¡Perdiste {nombre_jugador}, la palabra era '{palabra}'!", BLACK, 2000)
+            puntaje(0)
+            insertar_puntajes(nombre_jugador,puntuacion)
             break
 
         pygame.display.flip()
         
-def puntajes(nombre_jugador, puntaje):
-    leer_archivo = open("highscore.txt", "r")
+def puntaje(puntaje):
+    global puntuacion
+    puntuacion = puntaje
+    return puntuacion
+    
+        
+def insertar_puntajes(nombre_jugador, puntaje):
+    escribir_archivo = open("highscore.txt", "a")
+    escribir_archivo.write(f" \n {nombre_jugador} ------------ Puntaje = {puntaje}\n")
+    escribir_archivo.close()
+    
+    
+def mostrar_puntajes():
+    leer_archivo = open("highscore.txt")
     texto = font_menu.render(leer_archivo.read(), True, BLACK)
     leer_archivo.close()
-
+    
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        screen.fill(WHITE)
+        screen.blit(texto, (WIDTH // 2 - texto.get_width() // 2, HEIGHT // 2 + 100))
+        pygame.display.flip()
+    
+    
+    
+    
 #Armado del menu principal
 menu = pygame_menu.Menu('AHORCADO', WIDTH, HEIGHT,
                        theme=pygame_menu.themes.THEME_DEFAULT)
 
 nombre_jugador = ''
+puntuacion = 0
 
 menu.add.text_input('Nombre jugador: ', default='Coloca tu nombre', onchange=recibir_nombre_jugador)
 menu.add.button('Jugar', juego)
-menu.add.button('Puntajes', puntajes)
+menu.add.button('Puntajes', mostrar_puntajes)
 menu.add.button('Salir', pygame_menu.events.EXIT)
 
 menu.mainloop(screen)
