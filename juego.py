@@ -14,6 +14,9 @@ WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Ahorcado")
 
+FPS = 30
+clock = pygame.time.Clock()
+
 
 #Se defines colores
 WHITE = (255, 255, 255)
@@ -82,8 +85,7 @@ def juego():
     letras_correctas = set()
     intentos = 0
 
-    mostrar_cartel_animado(f"¡Comencemos, {nombre_jugador}! \n " +
-                           "Para jugar usar el teclado, tenés 6 intentos", BLACK, 2000)
+    mostrar_cartel_animado(f"¡Comencemos, {nombre_jugador}! Para jugar usar el teclado, tenés 6 intentos", BLACK, 2000)
 
     while True:
         for event in pygame.event.get():
@@ -135,20 +137,35 @@ def insertar_puntajes(nombre_jugador, puntaje):
     
 def mostrar_puntajes():
     leer_archivo = open("highscore.txt")
-    texto = font_menu.render(leer_archivo.read(), True, BLACK)
+    texto = leer_archivo.read()
+    texto_dibujo = font_menu.render(texto, True, BLACK, None)
+    
+    lineas = texto.splitlines()
     leer_archivo.close()
+
+    puntaje_rect = texto_dibujo.get_rect()
+    puntaje_rect.center = (WIDTH / 2, 10)
+    puntaje_rect.centery = 50
+    puntaje_rect.left = 200
     
     while True:
+        dt = clock.tick(FPS) / 1000
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
         screen.fill(WHITE)
-        screen.blit(texto, (WIDTH // 2 - texto.get_width() // 2, HEIGHT // 2 + 100))
-        pygame.display.flip()
-    
-    
-    
+        
+        for i in lineas:
+            pygame.time.delay(200)
+            texto_dibujo1 = font_menu.render(i,True,BLACK,None)
+            puntaje_rect.centery = puntaje_rect.centery + 10
+            screen.blit(texto_dibujo1, puntaje_rect)
+            if puntaje_rect.centery >= HEIGHT - 50:
+                menu.mainloop(screen)
+            pygame.display.flip()
+            pygame.time.delay(5)
+            
     
 #Armado del menu principal
 menu = pygame_menu.Menu('AHORCADO', WIDTH, HEIGHT,
@@ -156,6 +173,7 @@ menu = pygame_menu.Menu('AHORCADO', WIDTH, HEIGHT,
 
 nombre_jugador = ''
 puntuacion = 0
+
 
 menu.add.text_input('Nombre jugador: ', default='Coloca tu nombre', onchange=recibir_nombre_jugador)
 menu.add.button('Jugar', juego)
