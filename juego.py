@@ -67,7 +67,6 @@ def mostrar_cartel_animado(mensaje, color, duracion):
     texto_cartel = font_menu.render(mensaje, True, color)
     for i in range(1, 100):
         screen.fill(WHITE)
-        
         screen.blit(texto_cartel, (WIDTH // 2 - texto_cartel.get_width() // 2, i))
         pygame.display.flip()
         pygame.time.delay(5)
@@ -77,6 +76,8 @@ def mostrar_cartel_animado(mensaje, color, duracion):
 def recibir_nombre_jugador(value, **kwargs):
     global nombre_jugador
     nombre_jugador = value
+    if len(nombre_jugador) == 0 or nombre_jugador == '':
+        nombre_jugador = "SinNombre"
     return nombre_jugador
 
 #Loop principal del juego
@@ -85,7 +86,8 @@ def juego():
     letras_correctas = set()
     intentos = 0
 
-    mostrar_cartel_animado(f"¡Comencemos, {nombre_jugador}! Para jugar usar el teclado, tenés 6 intentos", BLACK, 2000)
+    mostrar_cartel_animado(f"¡Comencemos, {nombre_jugador}!", BLACK, 2000)
+    mostrar_cartel_animado(f" Para jugar usar el teclado, tenés 6 intentos", BLACK, 1500)
 
     while True:
         for event in pygame.event.get():
@@ -139,43 +141,54 @@ def mostrar_puntajes():
     leer_archivo = open("highscore.txt")
     texto = leer_archivo.read()
     texto_dibujo = font_menu.render(texto, True, BLACK, None)
-    
     lineas = texto.splitlines()
     leer_archivo.close()
 
     puntaje_rect = texto_dibujo.get_rect()
     puntaje_rect.center = (WIDTH / 2, 10)
     puntaje_rect.centery = 50
-    puntaje_rect.left = 200
+    puntaje_rect.left = 150
+    
+    cartel = font_menu.render("Los puntajes son:", True, BLACK, None)
+    cartel_rect = cartel.get_rect()
+    cartel_rect.center = (WIDTH / 2, 10)
+    cartel_rect.centery = 20
+    
+    
+    if len(texto) is 0:
+        mostrar_cartel_animado("No hay puntajes guardados",BLACK, 2000)
+        menu.mainloop(screen)
     
     while True:
-        dt = clock.tick(FPS) / 1000
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
         screen.fill(WHITE)
+        screen.blit(cartel,cartel_rect)
+        
         
         for i in lineas:
             pygame.time.delay(200)
             texto_dibujo1 = font_menu.render(i,True,BLACK,None)
             puntaje_rect.centery = puntaje_rect.centery + 10
             screen.blit(texto_dibujo1, puntaje_rect)
-            if puntaje_rect.centery >= HEIGHT - 50:
-                menu.mainloop(screen)
             pygame.display.flip()
             pygame.time.delay(5)
+            
+        pygame.time.delay(1000)
+        menu.mainloop(screen)
             
     
 #Armado del menu principal
 menu = pygame_menu.Menu('AHORCADO', WIDTH, HEIGHT,
                        theme=pygame_menu.themes.THEME_DEFAULT)
 
-nombre_jugador = ''
+nombre_jugador = 'SinNombre'
 puntuacion = 0
 
 
-menu.add.text_input('Nombre jugador: ', default='Coloca tu nombre', onchange=recibir_nombre_jugador)
+menu.add.text_input('Nombre jugador: ',default='Nombre', onchange=recibir_nombre_jugador)
 menu.add.button('Jugar', juego)
 menu.add.button('Puntajes', mostrar_puntajes)
 menu.add.button('Salir', pygame_menu.events.EXIT)
