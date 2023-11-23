@@ -3,8 +3,9 @@ import random
 import sys
 import pygame_menu
 import palabras
+from pygame_menu import sound
 
-#Cambiar letra de menu
+
 
 #Se inicializa la libreria pygame
 pygame.init()
@@ -12,11 +13,14 @@ pygame.init()
 #Se define el tamaño y el nombre de la ventana
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Ahorcado")
+pygame.display.set_caption("Grupo A comision 23592")
 
-FPS = 30
-clock = pygame.time.Clock()
+pygame.mixer.music.load('Sonidos\Minecraft.mp3')
+pygame.mixer.music.play(-1)
 
+tipear_sound = pygame.mixer.Sound(r"Sonidos\tipear.mp3")
+ganador_sound = pygame.mixer.Sound("Sonidos\winner.mp3")
+perdedor_sound = pygame.mixer.Sound("Sonidos\perder.mp3")
 
 #Se defines colores
 WHITE = (255, 255, 255)
@@ -26,8 +30,6 @@ RED = (255, 0, 0)
 #Se define las fuentes del titulo y el menu
 font_title = pygame.font.Font(None, 60)
 font_menu = pygame.font.Font(None, 36)
-
-
 
 #Se recibe las palabras desde palabras.py
 palabras = palabras.palabras_juego
@@ -76,8 +78,8 @@ def mostrar_cartel_animado(mensaje, color, duracion):
 def recibir_nombre_jugador(value, **kwargs):
     global nombre_jugador
     nombre_jugador = value
-    if len(nombre_jugador) == 0 or nombre_jugador == '':
-        nombre_jugador = "SinNombre"
+    if len(nombre_jugador) == 0:
+        nombre_jugador = "Hije de Angela"
     return nombre_jugador
 
 #Loop principal del juego
@@ -97,6 +99,8 @@ def juego():
 
             if event.type == pygame.KEYDOWN:
                 letra = event.unicode
+                pygame.mixer.Sound.play(tipear_sound)
+                pygame.mixer.music.stop()
                 if letra.isalpha() and letra.lower() not in letras_correctas:
                     letras_correctas.add(letra.lower())
                     if letra.lower() not in palabra:
@@ -115,9 +119,11 @@ def juego():
         if all(letra.isalpha() and letra.lower() in letras_correctas for letra in palabra):
             puntaje(calculos_puntos)
             insertar_puntajes(nombre_jugador,puntuacion)
+            pygame.mixer.Sound.play(ganador_sound)
             mostrar_cartel_animado(f"¡Felicidades!, {nombre_jugador} ¡Has ganado!", BLACK, 2000)
             break
         elif intentos >= 6:
+            pygame.mixer.Sound.play(perdedor_sound)
             mostrar_cartel_animado(f"¡Perdiste {nombre_jugador}, la palabra era '{palabra}'!", BLACK, 2000)
             puntaje(0)
             insertar_puntajes(nombre_jugador,puntuacion)
@@ -155,7 +161,7 @@ def mostrar_puntajes():
     cartel_rect.centery = 20
     
     
-    if len(texto) is 0:
+    if len(texto) == 0:
         mostrar_cartel_animado("No hay puntajes guardados",BLACK, 2000)
         menu.mainloop(screen)
     
@@ -184,11 +190,12 @@ def mostrar_puntajes():
 menu = pygame_menu.Menu('AHORCADO', WIDTH, HEIGHT,
                        theme=pygame_menu.themes.THEME_DEFAULT)
 
-nombre_jugador = 'SinNombre'
+nombre_jugador = 'Hije de Angela'
 puntuacion = 0
 
 
 menu.add.text_input('Nombre jugador: ',default='Nombre', onchange=recibir_nombre_jugador)
+
 menu.add.button('Jugar', juego)
 menu.add.button('Puntajes', mostrar_puntajes)
 menu.add.button('Salir', pygame_menu.events.EXIT)
