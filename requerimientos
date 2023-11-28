@@ -1,0 +1,4 @@
+Para correr el juego primero instalar las librerias Pygame y Pygame_menu
+
+pip install pygame
+pip install pygame_menu
