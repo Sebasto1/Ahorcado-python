@@ -15,17 +15,18 @@ WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Grupo A comision 23592")
 
+#Se carga archivos de sonido (de fondo y sonidos generales del juego)
 pygame.mixer.music.load('Sonidos\Minecraft.mp3')
+#Se usa el (-1) para que la musica del menu este en loop
 pygame.mixer.music.play(-1)
 
 tipear_sound = pygame.mixer.Sound(r"Sonidos\tipear.mp3")
-ganador_sound = pygame.mixer.Sound("Sonidos\winner.mp3")
-perdedor_sound = pygame.mixer.Sound("Sonidos\perder.mp3")
+ganador_sound = pygame.mixer.Sound(r"Sonidos\winner.mp3")
+perdedor_sound = pygame.mixer.Sound(r"Sonidos\perder.mp3")
 
 #Se defines colores
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-RED = (255, 0, 0)
 
 #Se define las fuentes del titulo y el menu
 font_title = pygame.font.Font(None, 60)
@@ -79,7 +80,7 @@ def recibir_nombre_jugador(value, **kwargs):
     global nombre_jugador
     nombre_jugador = value
     if len(nombre_jugador) == 0:
-        nombre_jugador = "Hije de Angela"
+        nombre_jugador = "Sin nombre"
     return nombre_jugador
 
 #Loop principal del juego
@@ -190,7 +191,7 @@ def mostrar_puntajes():
 menu = pygame_menu.Menu('AHORCADO', WIDTH, HEIGHT,
                        theme=pygame_menu.themes.THEME_DEFAULT)
 
-nombre_jugador = 'Hije de Angela'
+nombre_jugador = 'Sin nombre'
 puntuacion = 0
 
 
